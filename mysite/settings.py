@@ -38,7 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # my backend application
     'saVex',
+    # django and react integration
+    'corsheaders',
+    'webpack_loader'
+
 ]
 
 MIDDLEWARE = [
@@ -49,6 +54,23 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # django and react integration
+    'corsheaders.middleware.CorsMiddleware'
+]
+
+# django and react integration
+CORS_ORIGIN_ALLOW_ALL = True
+# Set WEBPACK_LOADER to tell Django how to interact with Webpack:
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/build'),
+    # ... any other static files directories ...
 ]
 
 ROOT_URLCONF = 'mysite.urls'

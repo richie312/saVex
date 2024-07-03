@@ -1,4 +1,4 @@
-from .models import AggregatedItems, SavingsItems
+from .models import AggregatedItems, SavingsItems, EarningItems
 from datetime import datetime
 
 
@@ -14,6 +14,9 @@ class RetirementCalculations:
         self.current_month = datetime.now().month
         self.life_expectancy = kwargs.get('life_expectancy', 85)
         self.annual_interest_rate = kwargs.get('annual_interest_rate', 0.05)
+        # if salary input is not provided, fetch from models
+        item = EarningItems.objects.get(id=1)
+        self.current_income = kwargs.get('current_income', item.Salary)
         
 
     def future_value(PV, r, n, t):

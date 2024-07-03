@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from saVex import views
+from saVex.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index),
+    path('template/', TemplateView.as_view(template_name='index.html'),name='template'),
+    path('default-values/', get_default_values),
 ]
