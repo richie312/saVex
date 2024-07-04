@@ -36,6 +36,7 @@ class SavingsItems(models.Model):
     LiquidFund = models.IntegerField(default=0)
     FixedDeposit = models.IntegerField(default=0)
     HouseDownPayment = models.IntegerField(default=0)
+    date = models.DateField(auto_now_add=True)
 
     @property
     # not including pf in current savings. this will be part of retirement solutions.

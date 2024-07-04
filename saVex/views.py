@@ -1,13 +1,17 @@
 from django.shortcuts import render
 from django.db.models import Sum
 from django.http import HttpResponse
-from saVex.calculate import RetirementCalculations
+from .calculate import RetirementCalculations
 from .models import *
 from django.views.generic import TemplateView
 from django.urls import path
-import requests
+import requests, json
 from django.http import JsonResponse
 from datetime import datetime
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+
+
 
 
 # create a view that will render the index.html template
@@ -33,7 +37,7 @@ def get_life_expectancy(country_code):
         if item['value'] is not None:
             return item['value']
     return None
-
+@csrf_exempt
 def get_default_values(request):
     if request.method == 'GET':
         args_ = {}
@@ -45,24 +49,25 @@ def get_default_values(request):
             args_[params[i]] = values[i]
         return JsonResponse(args_)
 
-
-def get_monthly_retirment_fund(request):
+@require_POST
+@csrf_exempt
+def get_monthly_retirement_fund(request):
     # Instantiate the RetirementCalculations class
-    # get this list of arguments from retirement_portfolio.html
-    args_ = ["retirement_age", "birth_year","life_expectancy",
-             "annual_interest_rate", "current_income"]
-
+    
     # Create a dictionary to store the values from the request
     arg_data = {}
+    data = json.loads(request.body)
+    args_ = list(data.keys())
 
     # Get the values from the request
     for arg in args_:
-        arg_data[arg] = request.GET.get(arg)  # Use request.POST.get(arg) for POST requests
-
-    retirement_calculations = RetirementCalculations(arg_data.values())
+        arg_data[arg] = data[arg]  # Use request.POST.get(arg) for POST requests
+    print(data)
+    print(arg_data)
+    retirement_calculations = RetirementCalculations(**data)
     monthly_investment = retirement_calculations.retirement()
     result = {
         'monthly_retirement_fund': monthly_investment
     }
-    
+    print(result)
     return JsonResponse(result)

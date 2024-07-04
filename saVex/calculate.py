@@ -1,5 +1,6 @@
-from .models import AggregatedItems, SavingsItems, EarningItems
+from .models import LiabilitiesItems, SavingsItems, EarningItems
 from datetime import datetime
+from django.db.models import Sum, Min
 
 
 class RetirementCalculations:
@@ -19,7 +20,7 @@ class RetirementCalculations:
         self.current_income = kwargs.get('current_income', item.Salary)
         
 
-    def future_value(PV, r, n, t):
+    def future_value(self,PV, n, t):
         """
         Calculate the future value of an amount.
 
@@ -32,10 +33,10 @@ class RetirementCalculations:
         Returns:
         float: The future value of the amount.
         """
-        FV = PV * (1 + r/n)**(n*t)
+        FV = PV * (1 + self.annual_interest_rate/n)**(n*t)
         return FV
 
-    def pmt(interest_rate, periods, present_value, future_value=0, when='end'):
+    def pmt(self, periods, present_value, future_value=0, when='end'):
         """
         Calculate the payment against loan principal plus interest.
 
@@ -50,11 +51,11 @@ class RetirementCalculations:
         float: The (fixed) periodic payment.
         """
         if when == 'beginning':
-            adjust = (1 + interest_rate)
+            adjust = (1 + self.annual_interest_rate)
         else:
             adjust = 1
 
-        pmt = - (future_value + present_value * (1 + interest_rate)**periods) / ((1 + interest_rate * (when == 'beginning')) * ((1 + interest_rate)**periods - 1))
+        pmt = - (future_value + present_value * (1 + self.annual_interest_rate)**periods) / ((1 + self.annual_interest_rate * (when == 'beginning')) * ((1 + self.annual_interest_rate)**periods - 1))
 
         return pmt * adjust
 
@@ -77,13 +78,21 @@ class RetirementCalculations:
         no_terms_left = self.number_of_years_left * 12 + no_terms_left_this_year
         retirement_life_corpus_years_left = self.life_expectancy - self.retirement_age
         #FV of currently monthly Income minus total_liabilities_per_month
-        current_liability = AggregatedItems.total_liabilities()
-        current_monthly_income = self.current_income / 12
-        future_value_of_current_income = self.future_value(current_monthly_income, self.annual_interest_rate, 12, no_terms_left)
-        future_value_of_current_liability = self.future_value(current_liability, self.annual_interest_rate, 12, no_terms_left)
+        smallest_id = LiabilitiesItems.objects.filter(date=datetime.now()).aggregate(Min('id'))
+        if smallest_id['id__min'] is None:
+            smallest_id = 1
+        else:
+            smallest_id = smallest_id['id__min']
+            
+        item = LiabilitiesItems.objects.get(id=smallest_id)
+        current_liability = item.total_liabilities
+        current_monthly_income = self.current_income
+        # Assuming these credits are paid off by the time of retirement.
+        net_income = current_monthly_income - current_liability
+        future_value_of_current_income = self.future_value(net_income, 12, no_terms_left)
         # TODO calculate realistic Life Expectancy.
-        retirement_fund = (future_value_of_current_income - future_value_of_current_liability) * retirement_life_corpus_years_left * 12
-        monthly_retirment_fund = self.pmt(self.annual_interest_rate, no_terms_left, 0, retirement_fund)
+        retirement_fund = future_value_of_current_income * retirement_life_corpus_years_left * 12
+        monthly_retirment_fund = self.pmt(no_terms_left, 0, retirement_fund)
         return monthly_retirment_fund
 
     def Retirement_monthly_gap(self):

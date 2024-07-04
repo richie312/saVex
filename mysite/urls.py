@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('template/', TemplateView.as_view(template_name='index.html'),name='template'),
     path('default-values/', get_default_values),
+    path('monthly-retirement-fund/', get_monthly_retirement_fund)
 ]
