@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 # Create your models here.
 
@@ -12,8 +13,9 @@ class ExpenseItems(models.Model):
     amazon_prime = models.IntegerField(default=0)
     onedrive = models.IntegerField(default=0)
     Grocery = models.IntegerField(default=0)
-    Misc = models.IntegerField(default=5000)
+    Misc = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
+    month = models.IntegerField(default=datetime.now().month)
 
     @property
     def total_expense(self):
@@ -25,6 +27,7 @@ class EarningItems(models.Model):
     Interest = models.IntegerField(default=0)
     PartTime = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
+    month = models.IntegerField(default=datetime.now().month)
 
     @property
     def total_earning(self):
@@ -37,7 +40,7 @@ class SavingsItems(models.Model):
     FixedDeposit = models.IntegerField(default=0)
     HouseDownPayment = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
-
+    month = models.IntegerField(default=datetime.now().month)
     @property
     # not including pf in current savings. this will be part of retirement solutions.
     def total_savings(self):
@@ -50,7 +53,7 @@ class InvestmentItems(models.Model):
     RealEstate = models.IntegerField(default=0)
     Crypto = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
-
+    month = models.IntegerField(default=datetime.now().month)
     @property
     def total_investment(self):
         return self.Stock + self.MutualFund + self.Gold + self.RealEstate + self.Crypto
@@ -62,7 +65,7 @@ class LiabilitiesItems(models.Model):
     CreditLoan = models.IntegerField(default=0)
     MedicalInsurance = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
-
+    month = models.IntegerField(default=datetime.now().month)
     @property
     def total_liabilities(self):
         return self.PersonalLoan + self.CreditCard + self.CreditLoan + self.MotherLoan + self.MedicalInsurance
@@ -83,3 +86,4 @@ class AggregatedItems(models.Model):
     Savings_gap = models.IntegerField(default=0)
     Home_downpayment_gap = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
+    month = models.IntegerField(default=datetime.now().month)

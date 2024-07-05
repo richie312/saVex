@@ -1,4 +1,4 @@
-import os
+import os, pdb
 from saVex.models import *
 from django.db.models import Sum, Min
 from django.core.mail import send_mail
@@ -34,6 +34,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('amount_fixed_for_grocery', type=int, help='Amount fixed for grocery')
 
+    def get_min_id(self, item_):
+        """Get the smallest id of the model object for the current date.
+        :param item_: model object
+        :return: smallest id of the model object for the current month.
+        """
+        smallest_id = ExpenseItems.objects.filter(month=datetime.now().month).aggregate(Min('id'))
+        id_ = smallest_id['id__min']
+        return id_
 
     def handle(self, *args, **options):
         # Calculate total expense
@@ -44,16 +52,23 @@ class Command(BaseCommand):
         # the grocery amount is dynamic and can be changed by the user.
         # calculate the logic for expected amount of grocery to be spent on a monthly basis.
         # determine the fixed cost of expenses monthly basis
-        smallest_id = ExpenseItems.objects.filter(date=datetime.now()).aggregate(Min('id'))['id__min']
-        item = ExpenseItems.objects.get(id= smallest_id)  # replace with your own criteria
+        min_id = self.get_min_id(ExpenseItems)
+        item = ExpenseItems.objects.get(id=min_id)  # replace with your own criterion
         fixed_expense = item.total_expense
-        # print(fixed_expense)
-        item = LiabilitiesItems.objects.get(id=smallest_id)
+        print(fixed_expense)
+        min_id = self.get_min_id(LiabilitiesItems)
+        print(min_id)
+        item = LiabilitiesItems.objects.get(id=min_id)
         current_liabilities = item.total_liabilities
-        item = SavingsItems.objects.get(id=smallest_id)
+        print(current_liabilities)
+        min_id = self.get_min_id(SavingsItems)
+        item = SavingsItems.objects.get(id=min_id)
         current_savings = item.total_savings
-        item = EarningItems.objects.get(id=smallest_id)
+        print(current_savings)
+        min_id = self.get_min_id(EarningItems)
+        item = EarningItems.objects.get(id=min_id)
         total_earning = item.total_earning
+        print(total_earning)
         # print(fixed_expense, current_liabilities,current_savings, total_earning)
         expected_amount_fixed_for_grocery = total_earning - (fixed_expense + current_liabilities + current_savings)
         amount_fixed_for_grocery = options.get('amount_fixed_for_grocery', 20000)
