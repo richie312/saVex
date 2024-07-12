@@ -166,3 +166,5 @@ cython_debug/
 
 # visual studio
 .vscode/
+
+*storybook.log

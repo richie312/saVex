@@ -1,10 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import $ from 'jquery';
+// import 'datatables.net-dt/css/jquery.dataTables.min.css';
+import 'datatables.net';
 
 function App() {
   const [birth_date, setbirth_date] = useState('');
   const [income, setIncome] = useState('');
   const [age, setage] = useState('');
   const[annual_interest_rate, setannual_interest_rate] = useState('');
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/get-portfolio-trajectory/')
+      .then(response => response.json())
+      .then(data => {
+        setTableData(data);
+        $('#myTable').DataTable();
+      });
+  }, []);
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/default-values/')
@@ -46,6 +59,7 @@ function App() {
   <header className="App-header">
     <h1>Retirement Portfolio</h1>
   </header>
+  <div className='left-panel'>
   <main>
     <form onSubmit={handleSubmit}>
       <div className="form-row">
@@ -71,6 +85,45 @@ function App() {
       </div>
     </form>
   </main>
+  </div>
+  <div className="right-panel">
+        <div className="row">
+
+        <table id="myTable" className="display">
+        <thead>
+          <tr>
+            <th>Age</th>
+            <th>Year</th>
+            <th>Rate Of Return</th>
+            <th>Inflation Rate</th>
+            <th>Investment @ Begin</th>
+            <th>Investment @ end</th>
+            <th>Net Gain</th>
+            <th>Inflation Adjusted Rate</th>
+            <th>Real Growth</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tableData.map((item, index) => (
+            <tr key={index}>
+              <td>{item.age}</td>
+              <td>{item.year}</td>
+              <td>{item.rate_of_return}</td>
+              <td>{item.inflation_rate}</td>
+              <td>{item.inv_begin}</td>
+              <td>{item.inv_end}</td>
+              <td>{item.net_gain}</td>
+              <td>{item.inflation_adj_rate}</td>
+              <td>{item.real_growth}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+
+        </div>
+        <div className="row">Row 2</div>
+    </div>
 </div>
   );
 }

@@ -20,6 +20,11 @@ class ExpenseItems(models.Model):
     @property
     def total_expense(self):
         return self.Rent + self.Maintenance + self.Electricity + self.netflix + self.youtube + self.amazon_prime + self.onedrive + self.Misc
+    
+    # this is for unit test purpose or to bypass the django database.
+    @total_expense.setter
+    def total_expense(self, value):
+        self._total_expense = value
 
 class EarningItems(models.Model):
     Salary = models.IntegerField(default=0)
@@ -33,6 +38,12 @@ class EarningItems(models.Model):
     def total_earning(self):
         return self.Salary + self.Bonus + self.Interest + self.PartTime
 
+    # this is for unit test purpose or to bypass the django database.
+    @total_earning.setter
+    def total_earning(self, value):
+        self._total_earning = value
+
+
 class SavingsItems(models.Model):
     NPS = models.IntegerField(default=0)
     PF = models.IntegerField(default=0)
@@ -45,6 +56,10 @@ class SavingsItems(models.Model):
     # not including pf in current savings. this will be part of retirement solutions.
     def total_savings(self):
         return self.NPS + self.LiquidFund + self.FixedDeposit + self.HouseDownPayment
+    @total_savings.setter
+    def total_savings(self, value):
+        self._total_savings = value
+
 
 class InvestmentItems(models.Model):
     Stock = models.IntegerField(default=0)
@@ -70,6 +85,10 @@ class LiabilitiesItems(models.Model):
     def total_liabilities(self):
         return self.PersonalLoan + self.CreditCard + self.CreditLoan + self.MotherLoan + self.MedicalInsurance
 
+    # this is for unit test purpose or to bypass the django database.
+    @total_liabilities.setter
+    def total_liabilities(self, value):
+        self._total_liabilities = value
 
 class AggregatedItems(models.Model):
     TotalExpense = models.IntegerField(default=0)

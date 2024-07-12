@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'saVex',
     # django and react integration
     'corsheaders',
-    'webpack_loader'
+    'webpack_loader',
+    # swagger
+    'drf_yasg',
 
 ]
 
