@@ -51,7 +51,6 @@ class Command(BaseCommand):
         fixed_expense = item.total_expense
         print(fixed_expense)
         min_id = get_min_id(LiabilitiesItems)
-        print(min_id)
         item = LiabilitiesItems.objects.get(id=min_id)
         current_liabilities = item.total_liabilities
         print(current_liabilities)
@@ -90,8 +89,9 @@ class Command(BaseCommand):
                        amount_fixed_for_grocery, 
                        expected_amount_fixed_for_grocery - amount_fixed_for_grocery,
                        per_day_expense, number_of_days)
-
+            send_sms(client, body_)
         else:
+            print("entered the else condition")
             # send notification
             body_ = """ Warning for Grocery Expense Update!!!
             Till now, the total grocery expense is {}.

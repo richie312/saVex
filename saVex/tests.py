@@ -1,9 +1,11 @@
+import os
 from django.test import TestCase
 from datetime import datetime
 from .models import *  # replace with your model
 from django.db.models import Sum, Min, Max
 from .utils import *
 import numpy_financial as npf
+from twilio.rest import Client
 
 # Create your tests here.    
 class TestUtilGenricFunctions(TestCase):
@@ -21,6 +23,17 @@ class TestUtilGenricFunctions(TestCase):
         min_id = get_min_id(ExpenseItems)
         item = ExpenseItems.objects.get(id=min_id)
         fixed_expense = item.total_expense
+
+    def test_twilio(self):
+        account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+        auth_token = os.environ["TWILIO_AUTH_TOKEN"]
+        client = Client(account_sid, auth_token)
+        body_ = "Hello, this is a test message from Twilio"
+        message = client.messages.create(
+        body=body_,
+        from_=os.environ["TWILIO_PHONE_NUMBER"],  # Your Twilio number
+        to=os.environ["PERSONAL_NUMBER"] )
+        print(message.sid)
 
 class TestRetirementCalcuations(TestCase):
     def setUp(self):
