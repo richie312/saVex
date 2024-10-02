@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DEFAULT_DATABASE = os.environ["DEFAULT_DATABASE"]
 
 # Application definition
 
@@ -106,16 +110,31 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     }
 # }
 
-DATABASES = {
+print(DEFAULT_DATABASE)
+
+if DEFAULT_DATABASE == "DOCKER_DB":
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ContainerDatabase',
         'USER': 'root',
-        'PASSWORD': 'Nirvikalpa#123',
-        'HOST': '192.168.1.20',   # Or an IP Address that your DB is hosted on
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }
+elif DEFAULT_DATABASE == 'DEFAULT_DB':
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ContainerDatabase',
+        'USER': 'root',
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_LOCAL_HOST'),    # Or an IP Address that your DB is hosted on        'PORT': '3306',
+        'PORT': '3306'
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -164,5 +183,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'richie.chatterjee31@gmail.com'
+EMAIL_HOST_USER = os.environ['EMAIL'] 
 EMAIL_HOST_PASSWORD = os.environ['GMAIL_PASSWORD']

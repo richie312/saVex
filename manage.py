@@ -9,6 +9,18 @@ def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
     try:
         from django.core.management import execute_from_command_line
+        # Default to using the local settings
+        DEFAULT_DATABASE = "DEFAULT_DB"
+
+        # Check for an argument to determine which settings to use
+        if len(sys.argv) > 1 and sys.argv[1] in ["dev", "local"]:
+            env = sys.argv.pop(1)
+            if env == "dev":
+                DEFAULT_DATABASE = "DOCKER_DB"
+            elif env == "local":
+                DEFAULT_DATABASE = "DEFAULT_DB"
+
+        os.environ.setdefault("DEFAULT_DATABASE", DEFAULT_DATABASE)
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "

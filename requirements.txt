@@ -2,3 +2,4 @@ twilio
 django
 django-cors-headers
 django-webpack-loader
+drf_yasg
