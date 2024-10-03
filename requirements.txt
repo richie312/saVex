@@ -4,3 +4,4 @@ django-cors-headers
 django-webpack-loader
 drf_yasg
 python-dotenv
+mysqlclient
