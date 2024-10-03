@@ -5,3 +5,4 @@ django-webpack-loader
 drf_yasg
 python-dotenv
 mysqlclient
+numpy-financial

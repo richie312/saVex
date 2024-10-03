@@ -9,7 +9,8 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     pkg-config \
-    libmysqlclient-dev && \
+    libmariadb-dev \
+    gcc && \
     rm -rf /var/lib/apt/lists/*
 
 # Verify that pkg-config is installed
